@@ -5,6 +5,8 @@
 Specs-as-code means the specs live in version control alongside the work they describe.
 
 - Specs are the source of truth for what must be built and how to verify it.
+- Specs describe product intent and user value, not just implementation details.
+- Specs define observable behavior and guardrails (constraints, invariants, compatibility); include implementation details only when they affect the contract.
 - Specs are small and modular: one feature/change area per spec folder.
 - Every change has a verification path (`how-to-test.md`) and a record (`changelog.md`).
 
@@ -55,6 +57,10 @@ The `version` field tracks meaningful changes to the contract:
 ## Writing good specs (2026 checklist)
 
 - Keep specs specific and testable (inputs/outputs, edge cases, constraints).
+- Include product framing such as user story and core value when defining workflows or features.
+- State scope and non-goals explicitly (what is out of scope).
+- Call out guardrails/invariants (what must not change; backwards-compat expectations).
+- Use clear headings so agents can navigate quickly (e.g. User Story, Core Value, Scope, Non-goals, Behavior, Guardrails, Acceptance criteria).
 - Prefer smaller specs; split large work into phases/specs.
 - Put acceptance criteria in checkboxes and keep it tight.
 - Make `how-to-test.md` executable (exact commands + expected results) where possible.

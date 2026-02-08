@@ -33,6 +33,3 @@ Add a new spec called `notifications`.
 ## Open source
 
 - License: see `LICENSE`
-- Contributing: see `CONTRIBUTING.md`
-- Code of Conduct: see `CODE_OF_CONDUCT.md`
-- Security: see `SECURITY.md`

@@ -8,11 +8,17 @@ version: 0.1.0
 
 # Template Spec
 
-## Goal
+## User story
+
+## Core value
+
+## Scope
 
 ## Non-goals
 
 ## Behavior
+
+## Guardrails
 
 ## Acceptance criteria
 
