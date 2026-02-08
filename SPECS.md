@@ -84,6 +84,8 @@ A spec lives in `specs/<area>/<feature>/` and must include:
 - `how-to-test.md` — how to verify this spec holds
 - `changelog.md` — append-only history of changes
 
+Optionally, the spec folder may include supporting docs like `implementation.md` for design/implementation notes and sequencing. Treat these as non-normative: `spec.md` is the contract.
+
 Each `spec.md` starts with YAML frontmatter:
 
 ```yaml
