@@ -81,10 +81,9 @@ The `version` field tracks meaningful changes to the contract:
 A spec lives in `specs/<area>/<feature>/` and must include:
 
 - `spec.md` — the living requirement
+- `implementation.md` — design/implementation notes: architecture decisions, sequencing, key algorithms, data flow, dependencies. Non-normative (`spec.md` is the contract) but essential for the next agent or developer to understand *how* things work.
 - `how-to-test.md` — how to verify this spec holds
 - `changelog.md` — append-only history of changes
-
-Optionally, the spec folder may include supporting docs like `implementation.md` for design/implementation notes and sequencing. Treat these as non-normative: `spec.md` is the contract.
 
 Each `spec.md` starts with YAML frontmatter:
 

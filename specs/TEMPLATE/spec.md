@@ -22,6 +22,8 @@ version: 0.1.0
 
 ## Acceptance criteria
 
-- [ ] Criterion 1
+- [ ] Folder contains `spec.md`, `implementation.md`, `how-to-test.md`, `changelog.md`
+- [ ] `spec.md` has valid YAML frontmatter
+- [ ] Spec is listed in `specs/INDEX.md`
 
 ## Notes

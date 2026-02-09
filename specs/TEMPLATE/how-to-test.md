@@ -2,6 +2,7 @@
 
 1. Confirm this spec folder contains:
    - `spec.md`
+   - `implementation.md`
    - `how-to-test.md`
    - `changelog.md`
    Expected: all files exist.

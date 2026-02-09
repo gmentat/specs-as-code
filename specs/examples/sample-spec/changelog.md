@@ -1,5 +1,10 @@
 # Changelog
 
+## 2026-02-09
+
+- Added required `implementation.md`.
+- Bumped `version`.
+
 ## 2026-02-07
 
 - Folded acceptance criteria into spec.md.

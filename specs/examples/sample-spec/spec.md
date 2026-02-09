@@ -3,7 +3,7 @@ id: examples.sample-spec
 title: Sample Spec
 area: examples
 status: active
-version: 0.1.1
+version: 0.1.2
 ---
 
 # Sample Spec
@@ -23,7 +23,7 @@ Provide a minimal, concrete example of a spec folder that follows the spec folde
 
 ## Acceptance criteria
 
-- [ ] Folder contains `spec.md`, `how-to-test.md`, `changelog.md`
+- [ ] Folder contains `spec.md`, `implementation.md`, `how-to-test.md`, `changelog.md`
 - [ ] `spec.md` has valid YAML frontmatter
 - [ ] Spec is listed in `specs/INDEX.md`
 
