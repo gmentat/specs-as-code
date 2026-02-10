@@ -4,6 +4,7 @@
    - `spec.md`
    - `implementation.md`
    - `how-to-test.md`
+   - `data-model.md`
    - `changelog.md`
    Expected: all files exist.
 

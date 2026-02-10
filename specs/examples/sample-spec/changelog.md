@@ -1,5 +1,10 @@
 # Changelog
 
+## 2026-02-10
+
+- Added required `data-model.md`.
+- Bumped `version`.
+
 ## 2026-02-09
 
 - Added required `implementation.md`.

@@ -22,7 +22,7 @@ version: 0.1.0
 
 ## Acceptance criteria
 
-- [ ] Folder contains `spec.md`, `implementation.md`, `how-to-test.md`, `changelog.md`
+- [ ] Folder contains `spec.md`, `implementation.md`, `how-to-test.md`, `data-model.md`, `changelog.md`
 - [ ] `spec.md` has valid YAML frontmatter
 - [ ] Spec is listed in `specs/INDEX.md`
 
