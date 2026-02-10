@@ -14,7 +14,7 @@ Specs-as-code means the specs live in version control alongside the work they de
 
 - All specs live under `specs/`.
 - Each spec is a folder: `specs/<area>/<feature>/`.
-- The folder is the unit of change and contains `spec.md`, `how-to-test.md`, and `changelog.md`.
+- The folder is the unit of change and contains `spec.md`, `how-to-test.md`, `data-model.md`, `changelog.md`, and `implementation.md`.
 
 ## What is `specs/INDEX.md`?
 
@@ -27,15 +27,17 @@ Specs-as-code means the specs live in version control alongside the work they de
 
 1. Read `specs/INDEX.md` — find the relevant spec(s)
 2. Read the spec’s `spec.md`
-3. Follow the spec’s `how-to-test.md`
-4. Check the spec’s `changelog.md` for recent changes
+3. Read the spec’s `data-model.md`
+4. Follow the spec’s `how-to-test.md`
+5. Check the spec’s `changelog.md` for recent changes
 
 ## Definition of Done (for any change)
 
 1. Relevant `spec.md` updated
-2. Relevant `changelog.md` appended (do not rewrite history)
-3. You followed the spec’s `how-to-test.md` (update it if the procedure changed)
-4. `specs/INDEX.md` updated if you added/moved a spec
+2. Relevant `data-model.md` updated
+3. Relevant `changelog.md` appended (do not rewrite history)
+4. You followed the spec’s `how-to-test.md` (update it if the procedure changed)
+5. `specs/INDEX.md` updated if you added/moved a spec
 
 ## Spec lifecycle
 
@@ -65,10 +67,27 @@ The `version` field tracks meaningful changes to the contract:
 - Put acceptance criteria in checkboxes and keep it tight.
 - Make `how-to-test.md` executable (exact commands + expected results) where possible.
 
+## Writing good `data-model.md` (checklist)
+
+- Define the **atomic unit** / **center-of-gravity** objects for the feature.
+  - The atomic unit is the object other parts of the system reference most often (the “primary key in your head”).
+- List the entities and their **stable identifiers**.
+  - Clarify which IDs are deterministic vs DB-assigned.
+  - Clarify which objects are immutable vs updated in-place.
+- State the **boundaries**.
+  - What is the primary query boundary (e.g. `docset_id`, `workspace_id`, `user_id`)?
+  - What are the ownership/tenant rules?
+- Specify **relationships**.
+  - Foreign-key style links between entities.
+  - Any “scaffold” fields that exist to support later UX (e.g. chunk -> `block_ids[]` for citations/highlights).
+- Call out **derived fields** vs persisted fields.
+- Call out critical **invariants**.
+  - Uniqueness, allowed state transitions, no-plaintext-secrets, citation stability/versioning, etc.
+
 ## Boundaries (recommended)
 
 - Always:
-  - Keep `spec.md`, `how-to-test.md`, `changelog.md`, and `specs/INDEX.md` consistent.
+  - Keep `spec.md`, `data-model.md`, `how-to-test.md`, `changelog.md`, and `specs/INDEX.md` consistent.
   - Append to `changelog.md` (do not rewrite history).
 - Ask first:
   - Renaming/moving specs.
@@ -81,9 +100,10 @@ The `version` field tracks meaningful changes to the contract:
 A spec lives in `specs/<area>/<feature>/` and must include:
 
 - `spec.md` — the living requirement
-- `implementation.md` — design/implementation notes: architecture decisions, sequencing, key algorithms, data flow, dependencies. Non-normative (`spec.md` is the contract) but essential for the next agent or developer to understand *how* things work.
 - `how-to-test.md` — how to verify this spec holds
+- `data-model.md` — the atomic unit / center-of-gravity objects and relationships that the feature builds around (stable IDs, boundaries, relationships, invariants, versioning)
 - `changelog.md` — append-only history of changes
+- `implementation.md` — design/implementation notes: architecture decisions, sequencing, key algorithms, data flow, dependencies. Non-normative (`spec.md` is the contract) but essential for the next agent or developer to understand *how* things work.
 
 Each `spec.md` starts with YAML frontmatter:
 
