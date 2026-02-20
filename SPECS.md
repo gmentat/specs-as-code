@@ -9,6 +9,7 @@ Specs-as-code means the specs live in version control alongside the work they de
 - Specs define observable behavior and guardrails (constraints, invariants, compatibility); include implementation details only when they affect the contract.
 - Specs are small and modular: one feature/change area per spec folder.
 - Every change has a verification path (`how-to-test.md`) and a record (`changelog.md`).
+- Project-wide invariants live in `specs/PRINCIPLES.md` — every spec must respect them.
 
 ## Organization
 
@@ -23,21 +24,30 @@ Specs-as-code means the specs live in version control alongside the work they de
 - Humans and agents start here to find the right spec without scanning the whole tree.
 - Every spec must be listed there (no dead links).
 
+## What is `specs/PRINCIPLES.md`?
+
+`specs/PRINCIPLES.md` captures the project's architectural and development principles.
+
+- These are rules, not aspirations — they constrain every spec and implementation.
+- When a spec or implementation violates a principle, it must be explicitly justified in `implementation.md`.
+
 ## Start here
 
-1. Read `specs/INDEX.md` — find the relevant spec(s)
-2. Read the spec’s `spec.md`
-3. Read the spec’s `data-model.md`
-4. Follow the spec’s `how-to-test.md`
-5. Check the spec’s `changelog.md` for recent changes
+1. Read `specs/PRINCIPLES.md` — understand project-wide constraints
+2. Read `specs/INDEX.md` — find the relevant spec(s)
+3. Read the spec's `spec.md`
+4. Read the spec's `data-model.md`
+5. Follow the spec's `how-to-test.md`
+6. Check the spec's `changelog.md` for recent changes
 
 ## Definition of Done (for any change)
 
 1. Relevant `spec.md` updated
 2. Relevant `data-model.md` updated
 3. Relevant `changelog.md` appended (do not rewrite history)
-4. You followed the spec’s `how-to-test.md` (update it if the procedure changed)
+4. You followed the spec's `how-to-test.md` (update it if the procedure changed)
 5. `specs/INDEX.md` updated if you added/moved a spec
+6. If spec status is `active`: Cross-artifact consistency checklist in `how-to-test.md` passes
 
 ## Spec lifecycle
 
@@ -45,8 +55,10 @@ Each spec has a lifecycle state in `spec.md` frontmatter:
 
 - `draft`
   - Work-in-progress; the contract may change.
+  - May contain `[NEEDS CLARIFICATION: question]` markers.
 - `active`
-  - Current contract; default for “this is how the system should work”.
+  - Current contract; default for "this is how the system should work".
+  - Must have zero unresolved `[NEEDS CLARIFICATION]` markers.
 - `deprecated`
   - Still documented, but should not be used for new work. Prefer pointing to the replacement spec in `spec.md`.
 
@@ -56,21 +68,87 @@ The `version` field tracks meaningful changes to the contract:
 - Minor: backwards-compatible behavior change
 - Major: breaking change to the contract
 
-## Writing good specs (2026 checklist)
+## Writing good specs (checklist)
+
+### What/why vs how
+
+`spec.md` describes **what** users need and **why**. It must not contain technology choices, API design, code structure, or implementation strategy — those belong in `implementation.md`.
+
+This separation ensures requirements survive technology changes and are readable by non-technical stakeholders.
+
+### Ambiguity markers
+
+When something is unknown or needs a decision, mark it inline:
+
+```
+[NEEDS CLARIFICATION: What happens when the user has no permissions?]
+```
+
+Rules:
+- A spec cannot move from `draft` to `active` with unresolved markers.
+- Limit to 3 markers per spec — if you have more, the scope is too broad.
+
+### User scenarios
+
+Write user scenarios with explicit priority (P1 = must-have, P2 = should-have, P3 = nice-to-have). Each scenario should be independently testable:
+
+```markdown
+### P1: [Scenario name]
+
+**As a** [role], **I want** [goal], **so that** [value].
+
+**Why this priority:** [Explain why this is P1.]
+
+**Independent test:** [Describe how to verify this scenario independently.]
+
+**Acceptance:**
+
+- Given [context], When [action], Then [outcome]
+```
+
+### Numbered requirements
+
+Number functional requirements with an FR prefix and use RFC2119-style normative language (`MUST`, `SHOULD`, `MAY`) with an explicit subject (for example: System, User, Spec folder). Each must be independently verifiable:
+
+```markdown
+- **FR-001**: [Subject] MUST [behavior]. Verified by [test reference].
+```
+
+Number success criteria with an SC prefix. Keep them measurable and technology-agnostic:
+
+```markdown
+- **SC-001**: [Measurable outcome]
+```
+
+### Acceptance criteria
+
+- Put acceptance criteria in checkboxes and keep them tight.
+- Include structural checks (files exist, frontmatter valid, listed in INDEX).
+- Include a check that all `[NEEDS CLARIFICATION]` markers are resolved (for `active` specs).
+- Include a check that all FR-* requirements are covered by `how-to-test.md`.
+
+### General
 
 - Keep specs specific and testable (inputs/outputs, edge cases, constraints).
 - Include product framing such as user story and core value when defining workflows or features.
 - State scope and non-goals explicitly (what is out of scope).
 - Call out guardrails/invariants (what must not change; backwards-compat expectations).
-- Use clear headings so agents can navigate quickly (e.g. User Story, Core Value, Scope, Non-goals, Behavior, Guardrails, Acceptance criteria).
+- Use clear headings so agents can navigate quickly.
 - Prefer smaller specs; split large work into phases/specs.
-- Put acceptance criteria in checkboxes and keep it tight.
 - Make `how-to-test.md` executable (exact commands + expected results) where possible.
+
+## Writing good `implementation.md` (checklist)
+
+- Record key technical decisions in the Decisions table with options considered and rationale.
+- Include consequences/tradeoffs for each decision.
+- Document architecture, sequencing, algorithms, data flow, and dependencies.
+- Record key risks and mitigations.
+- If an implementation violates a principle from `specs/PRINCIPLES.md`, justify it explicitly.
 
 ## Writing good `data-model.md` (checklist)
 
 - Define the **atomic unit** / **center-of-gravity** objects for the feature.
-  - The atomic unit is the object other parts of the system reference most often (the “primary key in your head”).
+  - The atomic unit is the object other parts of the system reference most often (the "primary key in your head").
 - List the entities and their **stable identifiers**.
   - Clarify which IDs are deterministic vs DB-assigned.
   - Clarify which objects are immutable vs updated in-place.
@@ -79,15 +157,22 @@ The `version` field tracks meaningful changes to the contract:
   - What are the ownership/tenant rules?
 - Specify **relationships**.
   - Foreign-key style links between entities.
-  - Any “scaffold” fields that exist to support later UX (e.g. chunk -> `block_ids[]` for citations/highlights).
+  - Any "scaffold" fields that exist to support later UX (e.g. chunk -> `block_ids[]` for citations/highlights).
 - Call out **derived fields** vs persisted fields.
 - Call out critical **invariants**.
   - Uniqueness, allowed state transitions, no-plaintext-secrets, citation stability/versioning, etc.
 
+## Writing good `how-to-test.md` (checklist)
+
+- Include numbered verification steps with explicit expected results.
+- Make steps executable (exact commands + expected output) where possible.
+- Cover every requirement (FR-*) and acceptance criterion from `spec.md`.
+- Include the **cross-artifact consistency checklist** (template provides one) and run it when the spec moves to `active` or after significant edits.
+
 ## Boundaries (recommended)
 
 - Always:
-  - Keep `spec.md`, `data-model.md`, `how-to-test.md`, `changelog.md`, and `specs/INDEX.md` consistent.
+  - Keep `spec.md`, `implementation.md`, `data-model.md`, `how-to-test.md`, `changelog.md`, and `specs/INDEX.md` consistent.
   - Append to `changelog.md` (do not rewrite history).
 - Ask first:
   - Renaming/moving specs.
@@ -99,11 +184,11 @@ The `version` field tracks meaningful changes to the contract:
 
 A spec lives in `specs/<area>/<feature>/` and must include:
 
-- `spec.md` — the living requirement
-- `how-to-test.md` — how to verify this spec holds
+- `spec.md` — the living requirement (what + why, no implementation details)
+- `how-to-test.md` — how to verify this spec holds, plus cross-artifact consistency checklist
 - `data-model.md` — the atomic unit / center-of-gravity objects and relationships that the feature builds around (stable IDs, boundaries, relationships, invariants, versioning)
 - `changelog.md` — append-only history of changes
-- `implementation.md` — design/implementation notes: architecture decisions, sequencing, key algorithms, data flow, dependencies. Non-normative (`spec.md` is the contract) but essential for the next agent or developer to understand *how* things work.
+- `implementation.md` — design/implementation notes: decisions log, architecture decisions, sequencing, key algorithms, data flow, dependencies. Non-normative (`spec.md` is the contract) but essential for the next agent or developer to understand *how* things work.
 
 Each `spec.md` starts with YAML frontmatter:
 
