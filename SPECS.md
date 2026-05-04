@@ -16,6 +16,8 @@ Specs-as-code means the specs live in version control alongside the work they de
 - All specs live under `specs/`.
 - Each spec is a folder: `specs/<area>/<feature>/`.
 - The folder is the unit of change and contains `spec.md`, `how-to-test.md`, `data-model.md`, `changelog.md`, and `implementation.md`.
+- Agent-run validation scenario catalogs live under `packages/scenarios/`; runner prompts live under `tests/ci-agent/`.
+- Review matrices and scenario planning docs may live next to the relevant spec when they explain coverage before it becomes executable.
 
 ## What is `specs/INDEX.md`?
 
@@ -39,6 +41,7 @@ Specs-as-code means the specs live in version control alongside the work they de
 4. Read the spec's `data-model.md`
 5. Follow the spec's `how-to-test.md`
 6. Check the spec's `changelog.md` for recent changes
+7. If the change affects deployed or agent-observable behavior, check the relevant scenario matrix/catalog and runner prompt
 
 ## Definition of Done (for any change)
 
@@ -48,6 +51,7 @@ Specs-as-code means the specs live in version control alongside the work they de
 4. You followed the spec's `how-to-test.md` (update it if the procedure changed)
 5. `specs/INDEX.md` updated if you added/moved a spec
 6. If spec status is `active`: Cross-artifact consistency checklist in `how-to-test.md` passes
+7. Relevant validation scenario matrix/catalog updated if the behavior change affects live, agent-run, or regression scenario coverage
 
 ## Spec lifecycle
 
@@ -105,6 +109,29 @@ Write user scenarios with explicit priority (P1 = must-have, P2 = should-have, P
 
 - Given [context], When [action], Then [outcome]
 ```
+
+### Validation scenarios
+
+User scenarios in `spec.md` describe customer intent and product value. Validation scenarios describe concrete system exercises that agents, CI, or humans run to prove the behavior works in practice. Keep these layers linked but separate:
+
+- Use `spec.md` for customer-facing workflows, requirements, acceptance criteria, and guardrails.
+- Use `how-to-test.md` for deterministic verification steps for the spec.
+- Use scenario matrices near the relevant spec for broad coverage planning, edge cases, and review status.
+- Use `packages/scenarios/<suite>/index.toml` as the source of truth for executable agent-run scenario catalogs.
+- Use `tests/ci-agent/*.md` for the runner prompts that tell validation agents how to execute and report those catalogs.
+
+Validation scenarios should be small enough to diagnose, realistic enough to catch integration failures, and cross-linked to the requirements or matrix rows they cover. A good executable scenario entry names:
+
+- scenario id and title
+- priority or gating level
+- capability or behavior under test
+- allowed environments / execution mode
+- setup requirements
+- expected terminal state or observable signals
+- checks the agent must verify
+- references to relevant FR-* requirements or scenario matrix rows
+
+Do not duplicate full scenario catalogs inside `spec.md`, `how-to-test.md`, or `SPECS.md`; link to the catalog/matrix instead. The catalog is the authority for scenario metadata once a scenario is executable.
 
 ### Numbered requirements
 
@@ -167,6 +194,7 @@ Number success criteria with an SC prefix. Keep them measurable and technology-a
 - Include numbered verification steps with explicit expected results.
 - Make steps executable (exact commands + expected output) where possible.
 - Cover every requirement (FR-*) and acceptance criterion from `spec.md`.
+- Link to relevant validation scenario matrices, catalogs, or runner prompts when live/agent validation is part of the verification path.
 - Include the **cross-artifact consistency checklist** (template provides one) and run it when the spec moves to `active` or after significant edits.
 
 ## Boundaries (recommended)
