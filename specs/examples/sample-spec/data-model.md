@@ -1,37 +1,39 @@
 # Data model
 
-This sample uses a minimal data model to demonstrate the required `data-model.md` file.
-
 ## Atomic unit
 
-- `spec_document`: the center-of-gravity object for a spec folder.
+`spec`: one coherent capability contract stored in one folder.
 
 ## Entities and stable identifiers
 
-- `spec_document`
-  - Stable identifier: `id` from `spec.md` frontmatter (for example `examples.sample-spec`).
-  - Update model: updated in-place as the contract evolves.
-- `spec_file`
-  - Stable identifier: repo-relative path (for example `specs/examples/sample-spec/spec.md`).
-  - Update model: updated in-place.
+### `spec`
 
-## Boundaries
+- **Purpose:** Groups the contracts for UC-001.
+- **Required by:** UC-001, FR-001, and FR-002
+- **Identity:** Unique `id` in `spec.md` frontmatter
+- **Attributes:** `title`, `area`, and `status`
 
-- Primary query boundary: spec folder path (`specs/<area>/<feature>/`).
-- Ownership: one spec folder owns its required files.
+## Relationships and boundaries
 
-## Relationships
+- One spec owns the artifacts required by IF-001 (UC-001, FR-001).
+- `specs/INDEX.md` links to each spec (FR-003).
 
-- One `spec_document` has many `spec_file` entries.
-- Required files are linked by naming convention in the same folder.
+## States and transitions
 
-## Derived vs persisted fields
+- `draft` → `active` or `deprecated` (spec lifecycle)
+- `active` → `deprecated` (spec lifecycle)
 
-- Persisted: file contents and frontmatter values on disk.
-- Derived: whether the folder is "valid" under the contract (computed from file presence and frontmatter checks).
+## Derived information
+
+- Folder validity is derived from IF-001, its index entry, and coverage checks.
 
 ## Invariants
 
-- Exactly one `spec.md` per spec folder.
-- Required files exist: `spec.md`, `implementation.md`, `how-to-test.md`, `data-model.md`, `changelog.md`.
-- `spec.md` frontmatter includes `id`, `title`, `area`, `status`, `version`.
+- A spec ID is unique.
+- One spec folder contains exactly one `spec.md`.
+- An active spec has no unresolved clarification markers.
+
+## Minimality check
+
+- [x] Every element is required now.
+- [x] No speculative or duplicate state remains.

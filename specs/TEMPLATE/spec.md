@@ -3,51 +3,12 @@ id: area.feature-name
 title: Feature Name
 area: area
 status: draft
-version: 0.1.0
 ---
 
-<!-- This file describes WHAT users need and WHY.
-     Do not include technology choices, API design, code structure, or
-     implementation strategy here — those belong in implementation.md.
-     Mark unknowns inline: [NEEDS CLARIFICATION: specific question]
-     A spec cannot move from draft to active with unresolved markers. -->
+<!-- Define normative scope and behavior. Link other artifacts; do not repeat them.
+     Exclude technology choices and internal structure. -->
 
 # Feature Name
-
-## Core value
-
-Why this feature matters in one or two sentences.
-
-## User scenarios
-
-### P1: Primary scenario
-
-**As a** [role], **I want** [goal], **so that** [value].
-
-**Why this priority:** [Explain why this is P1.]
-
-**Independent test:** [Describe how to verify this scenario independently.]
-
-**Acceptance:**
-
-- Given [context], When [action], Then [outcome]
-
-### P2: Secondary scenario (if applicable)
-
-**As a** [role], **I want** [goal], **so that** [value].
-
-**Why this priority:** [Explain why this is P2.]
-
-**Independent test:** [Describe how to verify this scenario independently.]
-
-**Acceptance:**
-
-- Given [context], When [action], Then [outcome]
-
-## Edge cases
-
-- What happens when [boundary condition]?
-- How does the system handle [error scenario]?
 
 ## Scope
 
@@ -59,14 +20,10 @@ Why this feature matters in one or two sentences.
 
 ## Requirements
 
-<!-- Each requirement uses RFC2119-style normative language (MUST/SHOULD/MAY) with an explicit subject and is independently testable. -->
+<!-- Use MUST/SHOULD/MAY, an explicit subject, and an observable result. -->
 
-- **FR-001**: [Subject] MUST [behavior]. Verified by [test reference].
-- **FR-002**: [Subject] MUST [behavior]. Verified by [test reference].
-
-## Key entities
-
-- **[Entity]**: [What it represents]
+- **FR-001**: [Subject] MUST [behavior]. Supports [UC-###]. Verified by [T-###].
+- **FR-002**: [Subject] MUST [behavior]. Supports [UC-###]. Verified by [T-###].
 
 ## Success criteria
 
@@ -77,10 +34,10 @@ Why this feature matters in one or two sentences.
 
 ## Acceptance criteria
 
-- [ ] Folder contains `spec.md`, `implementation.md`, `how-to-test.md`, `data-model.md`, `changelog.md`
-- [ ] `spec.md` has valid YAML frontmatter
-- [ ] Spec is listed in `specs/INDEX.md`
+- [ ] Required artifacts exist and the spec is indexed
 - [ ] No unresolved `[NEEDS CLARIFICATION]` markers remain (if status is `active`)
+- [ ] Every model element and interface has a current justification
+- [ ] Every interface has one exact canonical declaration
 - [ ] All requirements (FR-*) are covered by `how-to-test.md`
-
-## Notes
+- [ ] Specification review has no unresolved findings affecting behavior, contracts, or verification
+- [ ] Post-implementation comparison passes when application code exists

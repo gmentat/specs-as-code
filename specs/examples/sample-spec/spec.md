@@ -3,77 +3,43 @@ id: examples.sample-spec
 title: Sample Spec
 area: examples
 status: active
-version: 0.2.1
 ---
-
-<!-- This file describes WHAT and WHY. No implementation details here. -->
 
 # Sample Spec
 
-## Core value
-
-Provide a minimal, concrete example of a spec folder that follows the spec folder contract, so new contributors and agents can see the conventions in action.
-
-## User scenarios
-
-### P1: Copy the template to start a new spec
-
-**As a** contributor, **I want** to copy the sample spec folder as a starting point, **so that** I follow all conventions without reading the full guide.
-
-**Why this priority:** This is the primary workflow for new contributors and agents; without it, the template is harder to adopt correctly.
-
-**Independent test:** Copy the folder, replace placeholders, and run this folder's `how-to-test.md` steps end-to-end.
-
-**Acceptance:**
-
-- Given a new feature needs a spec, When I copy the sample folder and replace placeholder text, Then the result passes the spec folder contract checks.
-
-## Edge cases
-
-- What happens when the contributor forgets to update frontmatter fields like `id` or `status`?
-- How does the system handle missing required files in the spec folder?
-
 ## Scope
 
-- Demonstrate required files, frontmatter, numbered requirements, and cross-artifact consistency.
+- Demonstrate a minimal, valid spec folder.
 
 ## Non-goals
 
-- Implementing application code.
-- Demonstrating every optional section (keep it minimal).
+- Implement application code.
+- Add optional implementation notes without a concrete need.
 
 ## Behavior
 
-- This spec folder demonstrates the required files and frontmatter.
-- It is listed in `specs/INDEX.md`.
+- The sample follows the same contract as a real spec.
+- Contributors can copy and adapt the required templates.
 
 ## Guardrails
 
-- The sample must always pass its own `how-to-test.md`.
+- The sample remains minimal and passes `how-to-test.md`.
+- Each concept has one canonical artifact.
 
 ## Requirements
 
-- **FR-001**: Spec folder MUST contain `spec.md`, `implementation.md`, `how-to-test.md`, `data-model.md`, `changelog.md`. Verified by how-to-test step 1.
-- **FR-002**: `spec.md` MUST have valid YAML frontmatter with `id`, `title`, `area`, `status`, `version`. Verified by how-to-test step 2.
-- **FR-003**: Spec MUST be listed in `specs/INDEX.md`. Verified by how-to-test step 3.
-
-## Key entities
-
-- **spec_document**: The spec folder's primary contract, represented by `spec.md` frontmatter + the required companion files.
-- **spec_file**: A required file in the spec folder, identified by its repo-relative path.
+- **FR-001**: A spec folder MUST conform to the IF-001 folder layout. Supports UC-001. Verified by T-001.
+- **FR-002**: `spec.md` MUST conform to the IF-001 frontmatter declaration. Supports UC-001. Verified by T-002.
+- **FR-003**: Every spec MUST be linked from `specs/INDEX.md`. Supports UC-001. Verified by T-003.
 
 ## Success criteria
 
-- **SC-001**: A contributor can copy this folder and produce a valid spec with no guidance beyond the template comments.
+- **SC-001**: A contributor can create a valid spec using only the templates and their inline instructions.
 
 ## Acceptance criteria
 
-- [ ] Folder contains `spec.md`, `implementation.md`, `how-to-test.md`, `data-model.md`, `changelog.md`
-- [ ] `spec.md` has valid YAML frontmatter
-- [ ] Spec is listed in `specs/INDEX.md`
-- [ ] No unresolved `[NEEDS CLARIFICATION]` markers remain (status is `active`)
-- [ ] All requirements (FR-*) are covered by `how-to-test.md`
-
-## Notes
-
-- This repo is a template; projects should replace this with real specs.
+- [x] Required artifacts exist and the spec is indexed
+- [x] No unresolved clarification markers remain
+- [x] Every model element and interface has a current justification
+- [x] Every interface has one exact canonical declaration
+- [x] Every requirement is covered by `how-to-test.md`

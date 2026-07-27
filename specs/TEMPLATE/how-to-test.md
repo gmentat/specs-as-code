@@ -1,41 +1,44 @@
 # How to test
 
-## Verification steps
+## T-001: [Primary journey]
 
-1. Confirm this spec folder contains:
-   - `spec.md`
-   - `implementation.md`
-   - `how-to-test.md`
-   - `data-model.md`
-   - `changelog.md`
-   Expected: all files exist.
+- **Covers:** UC-001, FR-001, IF-001 `[operation]`
+- **Steps:** [Actions through the real client-visible interface]
+- **Expected:** [Observable result]
 
-2. Open `spec.md` and confirm YAML frontmatter includes:
-   - `id`
-   - `title`
-   - `area`
-   - `status` (one of: `draft`, `active`, `deprecated`)
-   - `version`
-   Expected: frontmatter parses as YAML.
+## T-002: [Meaningful failure or invariant]
 
-3. Confirm this spec is listed in `specs/INDEX.md`.
-   Expected: there is a link to this spec's `spec.md` and it resolves.
+- **Covers:** [Alternate path, FR-###, interface error, or model invariant]
+- **Steps:** [Actions]
+- **Expected:** [Observable behavior and state]
 
-4. Search this spec folder for `[NEEDS CLARIFICATION:` markers.
-   Expected:
-   - If `spec.md` status is `active`: no unresolved markers remain.
-   - If `spec.md` status is `draft`: markers are allowed, but each must be a specific question and total count is <= 3.
+## Contract checks
 
-5. Confirm every requirement (FR-*) in `spec.md` is covered by at least one verification step in this file.
-   Expected: there are no orphan requirements. (Tip: add `(Covers FR-###)` to the relevant steps.)
+- [ ] Required files exist: `use-cases.md`, `data-model.md`, `interfaces.md`, `spec.md`, `how-to-test.md`, and `changelog.md`; `implementation.md` may be absent
+- [ ] `spec.md` frontmatter contains valid `id`, `title`, `area`, and `status`
+- [ ] `specs/INDEX.md` links to this spec
+- [ ] Every interface contains an exact declaration or links to one existing canonical file under `contracts/`
+- [ ] Contract files parse, lint, or compile with project tooling when their format supports it
+- [ ] An active spec has no unresolved clarification markers in `use-cases.md`, `data-model.md`, `interfaces.md`, or `spec.md`
+- [ ] Every P1 use case, requirement, invariant, interface operation, and documented error is covered above
 
-## Cross-artifact consistency checklist
+## Specification review
 
-<!-- Run through this checklist when the spec moves to `active` or after significant edits. -->
+<!-- Run read-only before application code. Correct findings in their owning artifact,
+     then rerun the review. -->
 
-- [ ] Every entity in `data-model.md` is referenced in `spec.md`
-- [ ] Every requirement (FR-*) in `spec.md` is addressed by `implementation.md`
-- [ ] Every requirement (FR-*) in `spec.md` has a matching verification step above
-- [ ] Every acceptance criterion in `spec.md` has a matching verification step above
-- [ ] Terminology is consistent across all five files (no renamed concepts, no drift)
-- [ ] If `spec.md` status is `active`: no unresolved `[NEEDS CLARIFICATION]` markers in any file
+- [ ] Are primary, meaningful failure, and recovery paths defined or explicitly out of scope?
+- [ ] Is every requirement clear, objective, and independently verifiable?
+- [ ] Are assumptions that affect behavior, data, interfaces, or tests explicit?
+- [ ] Do use cases, the model, interfaces/contracts, requirements, and tests agree without duplication?
+- [ ] Is every model element and interface justified by a current use case or requirement?
+- [ ] Do tests cover current use cases, requirements, invariants, operations, and documented errors?
+- [ ] Does optional `implementation.md`, if present, agree with the contracts?
+
+## Post-implementation comparison
+
+<!-- Run after application code changes. Report findings before making fixes. -->
+
+- [ ] Code and tests conform to the use cases, model, interfaces/contracts, requirements, and project principles
+- [ ] Missing, partial, contradictory, and unrequested behavior has been resolved or explicitly reported
+- [ ] No protected contract was changed merely to match the implementation

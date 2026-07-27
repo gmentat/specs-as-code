@@ -1,224 +1,163 @@
-# SPECS.md (Specs-as-Code)
+# SPECS.md
 
-## Principles
+Specs as code keeps product and software contracts in version control alongside the implementation. The specs explain why a capability exists, how users or clients use it, the minimum domain model, the interfaces they rely on, the behavior that must hold, and how that behavior is verified.
 
-Specs-as-code means the specs live in version control alongside the work they describe.
+Humans and agents use the same contracts to plan, implement, review, and test changes. The specs are the source of truth for what must be built, and the implementation must conform to them. Specs change deliberately when the intended contract changes, not merely to accommodate a solution. Implementation details are non-normative unless users or clients depend on them.
 
-- Specs are the source of truth for what must be built and how to verify it.
-- Specs describe product intent and user value, not just implementation details.
-- Specs define observable behavior and guardrails (constraints, invariants, compatibility); include implementation details only when they affect the contract.
-- Specs are small and modular: one feature/change area per spec folder.
-- Every change has a verification path (`how-to-test.md`) and a record (`changelog.md`).
-- Project-wide invariants live in `specs/PRINCIPLES.md` — every spec must respect them.
+## Core rules
 
-## Organization
+1. Start with current use cases.
+2. Derive the minimum data model and client interfaces needed for those use cases.
+3. Specify observable behavior and constraints before implementation details.
+4. Every model element, interface, abstraction, and dependency MUST serve a current use case, requirement, or invariant.
+5. Choose the simplest design that does so; do not add fields, abstractions, or extension points for hypothetical needs.
+6. Keep each concept in one canonical file; link instead of duplicating.
+7. Keep one coherent feature or change area per spec folder.
 
-- All specs live under `specs/`.
-- Each spec is a folder: `specs/<area>/<feature>/`.
-- The folder is the unit of change and contains `spec.md`, `how-to-test.md`, `data-model.md`, `changelog.md`, and `implementation.md`.
-- Agent-run validation scenario catalogs live under `packages/scenarios/`; runner prompts live under `tests/ci-agent/`.
-- Review matrices and scenario planning docs may live next to the relevant spec when they explain coverage before it becomes executable.
+Additional project-wide rules MAY live in `specs/PRINCIPLES.md`. Rules defined there constrain every spec and implementation.
 
-## What is `specs/INDEX.md`?
+## Protected contracts
 
-`specs/INDEX.md` is the canonical table of contents for specs.
+Product intent and use cases, normative requirements, stable interfaces, and critical data-model identity, relationships, states, and invariants are protected contracts.
 
-- Humans and agents start here to find the right spec without scanning the whole tree.
-- Every spec must be listed there (no dead links).
+- Fit the solution to the contracts. Never change a contract merely to fit an implementation.
+- Change a protected contract only for a demonstrated current need or to correct the contract.
+- Before changing one, explain the need and any relevant impact on users, clients, data, compatibility, or migration.
+- Obtain human approval before making the change. If approval is unavailable, mark the issue for clarification and leave the contract unchanged.
 
-## What is `specs/PRINCIPLES.md`?
+## Spec folder
 
-`specs/PRINCIPLES.md` captures the project's architectural and development principles.
+Specs live in `specs/<area>/<feature>/`.
 
-- These are rules, not aspirations — they constrain every spec and implementation.
-- When a spec or implementation violates a principle, it must be explicitly justified in `implementation.md`.
+| File | Status | Purpose |
+|------|--------|---------|
+| `use-cases.md` | Required | Users or clients, triggers, flows, and outcomes |
+| `data-model.md` | Required | Minimum domain concepts and invariants |
+| `interfaces.md` | Required | Clients, stable boundaries, and contract links |
+| `contracts/` | Conditional | Canonical exact interface definitions |
+| `spec.md` | Required | Normative scope, behavior, requirements, and guardrails |
+| `how-to-test.md` | Required | Verification steps and consistency checks |
+| `changelog.md` | Required | Append-only contract history |
+| `implementation.md` | Optional | Non-normative internal decisions |
 
-## Start here
+Create `contracts/` only when an interface uses an established contract format or is too large to define clearly inline. Never create an empty placeholder.
 
-1. Read `specs/PRINCIPLES.md` — understand project-wide constraints
-2. Read `specs/INDEX.md` — find the relevant spec(s)
-3. Read the spec's `spec.md`
-4. Read the spec's `data-model.md`
-5. Follow the spec's `how-to-test.md`
-6. Check the spec's `changelog.md` for recent changes
-7. If the change affects deployed or agent-observable behavior, check the relevant scenario matrix/catalog and runner prompt
+If no domain model or stable interface exists, say so briefly in the corresponding file. Do not invent one.
 
-## Definition of Done (for any change)
+Every spec MUST be linked from `specs/INDEX.md`. Create the index when adding the first spec if it does not exist.
 
-1. Relevant `spec.md` updated
-2. Relevant `data-model.md` updated
-3. Relevant `changelog.md` appended (do not rewrite history)
-4. You followed the spec's `how-to-test.md` (update it if the procedure changed)
-5. `specs/INDEX.md` updated if you added/moved a spec
-6. If spec status is `active`: Cross-artifact consistency checklist in `how-to-test.md` passes
-7. Relevant validation scenario matrix/catalog updated if the behavior change affects live, agent-run, or regression scenario coverage
+## Workflow
 
-## Spec lifecycle
+For new capabilities and meaningful behavior changes:
 
-Each spec has a lifecycle state in `spec.md` frontmatter:
+1. Define `use-cases.md`.
+2. Derive `data-model.md`.
+3. Define `interfaces.md` and any needed files under `contracts/`.
+4. Complete `spec.md`.
+5. Write `implementation.md` only if durable internal context is needed.
+6. Derive `how-to-test.md` from the preceding artifacts.
+7. Run the specification review below, correct its findings, and rerun it.
+8. Append the change to `changelog.md`.
+9. After application code changes, perform the post-implementation comparison below.
 
-- `draft`
-  - Work-in-progress; the contract may change.
-  - May contain `[NEEDS CLARIFICATION: question]` markers.
-- `active`
-  - Current contract; default for "this is how the system should work".
-  - Must have zero unresolved `[NEEDS CLARIFICATION]` markers.
-- `deprecated`
-  - Still documented, but should not be used for new work. Prefer pointing to the replacement spec in `spec.md`.
+When changing an existing capability, read `specs/PRINCIPLES.md` when present, then `specs/INDEX.md` and the required files in workflow order. Read `implementation.md` only when it exists and is relevant.
 
-The `version` field tracks meaningful changes to the contract:
+## Specification review
 
-- Patch: clarification/formatting only (no behavioral change)
-- Minor: backwards-compatible behavior change
-- Major: breaking change to the contract
+After drafting the required artifacts and before writing application code, review the specification read-only.
 
-## Writing good specs (checklist)
+Check:
 
-### What/why vs how
+- Are the primary, meaningful failure, and recovery paths defined or explicitly out of scope?
+- Is every requirement clear, objective, and independently verifiable?
+- Are assumptions that affect behavior, data, interfaces, or tests explicit?
+- Do use cases, the model, interfaces/contracts, requirements, and tests agree without duplication?
+- Is every model element and interface justified by a current use case or requirement?
+- Do tests cover the current use cases, requirements, invariants, operations, and documented errors?
 
-`spec.md` describes **what** users need and **why**. It must not contain technology choices, API design, code structure, or implementation strategy — those belong in `implementation.md`.
+Report each finding with its file and line and the relevant contract reference. Do not edit files during the review. Correct findings in the artifact that owns the concept, apply the protected-contract approval rules, then rerun the review. Do not begin implementation while findings that affect behavior, contracts, or verification remain.
 
-This separation ensures requirements survive technology changes and are readable by non-technical stakeholders.
+A fresh reviewing agent or context is preferable but not required. The reviewer applies these checks and treats `specs/PRINCIPLES.md`, when present, as additional constraints; principles alone are not the test.
 
-### Ambiguity markers
+## Post-implementation comparison
 
-When something is unknown or needs a decision, mark it inline:
+Before declaring implementation complete:
 
-```
-[NEEDS CLARIFICATION: What happens when the user has no permissions?]
-```
+1. Compare the current code and tests with the use cases, data model, interfaces/contracts, requirements, and any project principles.
+2. Report each gap as `missing`, `partial`, `contradictory`, or `unrequested`, with evidence and its contract reference.
+3. Resolve gaps in the implementation by default. Do not edit a protected contract to hide implementation drift.
+4. Apply the protected-contract approval rules if a contract is genuinely wrong or must change.
+5. Rerun `how-to-test.md`. Completion requires no unresolved contract gaps.
 
-Rules:
-- A spec cannot move from `draft` to `active` with unresolved markers.
-- Limit to 3 markers per spec — if you have more, the scope is too broad.
+The comparison is read-only until its findings are reported. Remediation is a separate step.
 
-### User scenarios
+## Artifact rules
 
-Write user scenarios with explicit priority (P1 = must-have, P2 = should-have, P3 = nice-to-have). Each scenario should be independently testable:
+### `use-cases.md`
 
-```markdown
-### P1: [Scenario name]
+- Give each use case a stable `UC-###` identifier and priority.
+- State the actor or client, trigger, goal, expected outcome, and shortest successful flow.
+- Include only meaningful alternate or failure paths.
+- Define what users observe and the concepts they must understand.
+- Include an independently verifiable acceptance example.
+- Exclude implementation and storage details.
 
-**As a** [role], **I want** [goal], **so that** [value].
+### `data-model.md`
 
-**Why this priority:** [Explain why this is P1.]
+- Model the domain, not a speculative database schema.
+- Identify the atomic unit and only the entities, attributes, relationships, and states required now.
+- Link each model element to a use case, requirement, or invariant.
+- Define identity, ownership, lifecycle, and state transitions only where required.
+- Prefer derived information over duplicate persisted state.
+- Exclude placeholders and elements intended only for anticipated features.
 
-**Independent test:** [Describe how to verify this scenario independently.]
+### `interfaces.md`
 
-**Acceptance:**
+- Document stable boundaries used by clients: APIs, commands, events, shared libraries, or file formats.
+- Give each interface a stable `IF-###` identifier and identify its clients and supported use cases.
+- Every interface MUST contain or link to an exact client-visible declaration. A prose-only description is insufficient.
+- Keep a small declaration inline. Put it under `contracts/` when it uses a standard file format or is too long to keep inline. Maintain one canonical definition.
+- Use the boundary's native contract form:
+  - HTTP: OpenAPI
+  - GraphQL: schema definition language
+  - RPC: Protobuf or the relevant IDL
+  - Events: AsyncAPI or an exact message schema
+  - Library or module: exact public signatures and types
+  - CLI: command grammar, arguments, streams, and exit codes
+  - File or configuration: JSON Schema or a precise grammar
+- State only semantics the declaration cannot express, such as error conditions, side effects, preconditions, idempotency, ordering, or compatibility guarantees.
+- Prefer intent-oriented operations over storage-shaped CRUD.
+- Include only operations required by current use cases.
+- Keep private functions, classes, adapters, and replaceable internal boundaries in code.
 
-- Given [context], When [action], Then [outcome]
-```
+### `spec.md`
 
-### Validation scenarios
+- Define scope, non-goals, observable behavior, requirements, and guardrails.
+- Link to use cases, model concepts, and interfaces instead of repeating them.
+- Give functional requirements stable `FR-###` identifiers.
+- Use `MUST`, `SHOULD`, or `MAY` with an explicit subject and verifiable result.
+- Give measurable success criteria stable `SC-###` identifiers.
+- Exclude technology choices and internal code structure.
 
-User scenarios in `spec.md` describe customer intent and product value. Validation scenarios describe concrete system exercises that agents, CI, or humans run to prove the behavior works in practice. Keep these layers linked but separate:
+### `how-to-test.md`
 
-- Use `spec.md` for customer-facing workflows, requirements, acceptance criteria, and guardrails.
-- Use `how-to-test.md` for deterministic verification steps for the spec.
-- Use scenario matrices near the relevant spec for broad coverage planning, edge cases, and review status.
-- Use `packages/scenarios/<suite>/index.toml` as the source of truth for executable agent-run scenario catalogs.
-- Use `tests/ci-agent/*.md` for the runner prompts that tell validation agents how to execute and report those catalogs.
+- Give verification cases stable `T-###` identifiers and explicit expected results.
+- Cover every P1 use case, requirement, model invariant, interface operation, and documented error.
+- Exercise the real client-visible boundary for the primary journey when practical.
+- Link external test suites or scenario catalogs instead of duplicating them.
+- Include the specification review checks.
 
-Validation scenarios should be small enough to diagnose, realistic enough to catch integration failures, and cross-linked to the requirements or matrix rows they cover. A good executable scenario entry names:
+### `implementation.md`
 
-- scenario id and title
-- priority or gating level
-- capability or behavior under test
-- allowed environments / execution mode
-- setup requirements
-- expected terminal state or observable signals
-- checks the agent must verify
-- references to relevant FR-* requirements or scenario matrix rows
+This file is optional and non-normative. Create it only when important internal decisions cannot be understood easily from the code. Never create a placeholder or repeat contracts.
 
-Do not duplicate full scenario catalogs inside `spec.md`, `how-to-test.md`, or `SPECS.md`; link to the catalog/matrix instead. The catalog is the authority for scenario metadata once a scenario is executable.
+### `changelog.md`
 
-### Numbered requirements
+Append dated entries. Never rewrite or remove history.
 
-Number functional requirements with an FR prefix and use RFC2119-style normative language (`MUST`, `SHOULD`, `MAY`) with an explicit subject (for example: System, User, Spec folder). Each must be independently verifiable:
+## Status
 
-```markdown
-- **FR-001**: [Subject] MUST [behavior]. Verified by [test reference].
-```
-
-Number success criteria with an SC prefix. Keep them measurable and technology-agnostic:
-
-```markdown
-- **SC-001**: [Measurable outcome]
-```
-
-### Acceptance criteria
-
-- Put acceptance criteria in checkboxes and keep them tight.
-- Include structural checks (files exist, frontmatter valid, listed in INDEX).
-- Include a check that all `[NEEDS CLARIFICATION]` markers are resolved (for `active` specs).
-- Include a check that all FR-* requirements are covered by `how-to-test.md`.
-
-### General
-
-- Keep specs specific and testable (inputs/outputs, edge cases, constraints).
-- Include product framing such as user story and core value when defining workflows or features.
-- State scope and non-goals explicitly (what is out of scope).
-- Call out guardrails/invariants (what must not change; backwards-compat expectations).
-- Use clear headings so agents can navigate quickly.
-- Prefer smaller specs; split large work into phases/specs.
-- Make `how-to-test.md` executable (exact commands + expected results) where possible.
-
-## Writing good `implementation.md` (checklist)
-
-- Record key technical decisions in the Decisions table with options considered and rationale.
-- Include consequences/tradeoffs for each decision.
-- Document architecture, sequencing, algorithms, data flow, and dependencies.
-- Record key risks and mitigations.
-- If an implementation violates a principle from `specs/PRINCIPLES.md`, justify it explicitly.
-
-## Writing good `data-model.md` (checklist)
-
-- Define the **atomic unit** / **center-of-gravity** objects for the feature.
-  - The atomic unit is the object other parts of the system reference most often (the "primary key in your head").
-- List the entities and their **stable identifiers**.
-  - Clarify which IDs are deterministic vs DB-assigned.
-  - Clarify which objects are immutable vs updated in-place.
-- State the **boundaries**.
-  - What is the primary query boundary (e.g. `docset_id`, `workspace_id`, `user_id`)?
-  - What are the ownership/tenant rules?
-- Specify **relationships**.
-  - Foreign-key style links between entities.
-  - Any "scaffold" fields that exist to support later UX (e.g. chunk -> `block_ids[]` for citations/highlights).
-- Call out **derived fields** vs persisted fields.
-- Call out critical **invariants**.
-  - Uniqueness, allowed state transitions, no-plaintext-secrets, citation stability/versioning, etc.
-
-## Writing good `how-to-test.md` (checklist)
-
-- Include numbered verification steps with explicit expected results.
-- Make steps executable (exact commands + expected output) where possible.
-- Cover every requirement (FR-*) and acceptance criterion from `spec.md`.
-- Link to relevant validation scenario matrices, catalogs, or runner prompts when live/agent validation is part of the verification path.
-- Include the **cross-artifact consistency checklist** (template provides one) and run it when the spec moves to `active` or after significant edits.
-
-## Boundaries (recommended)
-
-- Always:
-  - Keep `spec.md`, `implementation.md`, `data-model.md`, `how-to-test.md`, `changelog.md`, and `specs/INDEX.md` consistent.
-  - Append to `changelog.md` (do not rewrite history).
-- Ask first:
-  - Renaming/moving specs.
-  - Changing the spec folder contract.
-- Never:
-  - Rewrite `changelog.md` history.
-
-## Spec folder contract
-
-A spec lives in `specs/<area>/<feature>/` and must include:
-
-- `spec.md` — the living requirement (what + why, no implementation details)
-- `how-to-test.md` — how to verify this spec holds, plus cross-artifact consistency checklist
-- `data-model.md` — the atomic unit / center-of-gravity objects and relationships that the feature builds around (stable IDs, boundaries, relationships, invariants, versioning)
-- `changelog.md` — append-only history of changes
-- `implementation.md` — design/implementation notes: decisions log, architecture decisions, sequencing, key algorithms, data flow, dependencies. Non-normative (`spec.md` is the contract) but essential for the next agent or developer to understand *how* things work.
-
-Each `spec.md` starts with YAML frontmatter:
+Each `spec.md` starts with:
 
 ```yaml
 ---
@@ -226,14 +165,30 @@ id: area.feature-name
 title: Feature Name
 area: area
 status: draft
-version: 0.1.0
 ---
 ```
 
-`specs/INDEX.md` is the canonical index — every spec must be listed there.
+Status:
 
-## Conventions
+- `draft`: contract may change; clarification markers are allowed.
+- `active`: current contract; no clarification markers are allowed.
+- `deprecated`: retained for reference; point to a replacement when one exists.
 
-- Prefer editing an existing spec over creating a new one.
-- Keep changes minimal.
-- Do not invent new repository structure without updating a spec.
+Use `[NEEDS CLARIFICATION: specific question]` for unresolved decisions. Allow at most three per spec folder.
+
+## Completion checklist
+
+- [ ] Required files exist and the spec is in `specs/INDEX.md`.
+- [ ] Specification review has no unresolved findings affecting behavior, contracts, or verification.
+- [ ] Any protected contract change has human approval.
+- [ ] `how-to-test.md` passes.
+- [ ] After application code changes, the post-implementation comparison has no unresolved contract gaps.
+- [ ] An active spec has no unresolved clarification markers.
+- [ ] `implementation.md`, when present, agrees with the contracts.
+- [ ] `changelog.md` contains a new appended entry.
+
+## Agent boundaries
+
+- Keep changes minimal and prefer updating an existing spec.
+- Ask before changing a protected contract, renaming or moving a spec, or changing this folder contract.
+- Never rewrite changelog history.

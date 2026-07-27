@@ -1,0 +1,65 @@
+openapi: 3.1.0
+info:
+  title: Product Details API
+  version: 1.0.0
+paths:
+  /v1/products/{product_id}:
+    get:
+      operationId: getProduct
+      summary: Retrieve one product
+      parameters:
+        - name: product_id
+          in: path
+          required: true
+          schema:
+            type: string
+            minLength: 1
+      responses:
+        "200":
+          description: Product found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Product"
+              example:
+                product_id: prod_123
+                name: Desk Lamp
+                availability: in_stock
+        "404":
+          description: Product not found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ProductNotFound"
+              example:
+                code: product_not_found
+components:
+  schemas:
+    Product:
+      type: object
+      additionalProperties: false
+      required:
+        - product_id
+        - name
+        - availability
+      properties:
+        product_id:
+          type: string
+          minLength: 1
+        name:
+          type: string
+          minLength: 1
+        availability:
+          type: string
+          enum:
+            - in_stock
+            - out_of_stock
+    ProductNotFound:
+      type: object
+      additionalProperties: false
+      required:
+        - code
+      properties:
+        code:
+          type: string
+          const: product_not_found
